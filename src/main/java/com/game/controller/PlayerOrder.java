@@ -1,7 +1,7 @@
 package com.game.controller;
 
 public enum PlayerOrder {
-    ID("id"), // default
+    ID("id"),
     NAME("name"),
     EXPERIENCE("experience"),
     BIRTHDAY("birthday"),

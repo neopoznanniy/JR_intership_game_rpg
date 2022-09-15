@@ -10,12 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import javax.xml.bind.ValidationException;
 import java.util.*;
 
 @RestController
@@ -84,29 +81,7 @@ public class PlayerController {
 
     @GetMapping("/{id}")
     Player one(@PathVariable String id) {
-        /*System.out.println("method one:");
-        System.out.println(id);*/
-        Player player = null;
-        Long longId = null;
-        try {
-            longId = Long.parseLong(id);
-            if (longId <= 0) throw new ValidationException("Id is zero or less");
-            player = service.findById(longId).get();
-        } catch (Exception e) {
-//            System.out.println(e);
-            if (e instanceof ValidationException || e instanceof NumberFormatException)
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Id is not valid", e);
-            if (e instanceof NoSuchElementException)
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Player not found", e);
-        }
-
-        return player;
-        /*return service.findById(id)
-                .orElseThrow(
-                        () -> new PlayerNotFoundException(id)
-                );*/
+        return service.findById(id);
     }
 
     @PostMapping("/{id}")

@@ -117,7 +117,6 @@ public class PlayersService {
         System.out.println("PlayersController.newPlayer");
         System.out.println("newPlayer = " + player);
         System.out.println("newPLayer is null: " + player == null );
-//        Long longId = null;
         try {
             if (player.getName() == null || player.getTitle() == null || player.getRace() == null ||
                     player.getProfession() == null || player.getBirthday() == null || player.getExperience() == null ||
@@ -146,16 +145,26 @@ public class PlayersService {
     }
 
     @Transactional
-    public Optional<Player> findById(Long id) {
-        return playerCrudRepository.findById(id);
-    }
-
-    public Player save(Player player) {
-        return playerCrudRepository.save(player);
+    public Player findById(String id) {
+        Player player = null;
+        Long longId = null;
+        try {
+            longId = Long.parseLong(id);
+            if (longId <= 0) throw new ValidationException("Id is zero or less");
+            player = playerCrudRepository.findById(longId).get();
+        } catch (Exception e) {
+//            System.out.println(e);
+            if (e instanceof ValidationException || e instanceof NumberFormatException)
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Id is not valid", e);
+            if (e instanceof NoSuchElementException)
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Player not found", e);
+        }
+        return player;
     }
 
     public void deleteById(String id) {
-
         Player player = null;
         Long longId = null;
         try {
@@ -175,11 +184,8 @@ public class PlayersService {
     }
 
     public Player replacePlayer(Player newPlayer, String id) {
-         /*System.out.println("method replace:");
-        System.out.println(id);*/
         Player oldPlayer = null;
         Long longId = null;
-//        System.out.println("newPlayer = " + newPlayer + ", id = " + id);
         try {
             longId = Long.parseLong(id);
             if (longId <= 0) throw new ValidationException("Id is zero");
@@ -188,15 +194,13 @@ public class PlayersService {
             if (newPlayer.getBirthday().getTime() < 0) throw new ValidationException("Invalid birthday");
             oldPlayer = playerCrudRepository.findById(longId).get();
         } catch (Exception e) {
-//            System.out.println(e);
             if (e instanceof ValidationException || e instanceof NumberFormatException)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameters is not valid", e);
             if (e instanceof NoSuchElementException)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found", e);
         }
         final Long FIN_LONG_ID = longId;
-        /*System.out.println("longId = " + longId);
-        System.out.println("newPlayer = " + newPlayer);*/
+
         return playerCrudRepository.findById(longId)
                 .map(player -> {
                     if (newPlayer.getName() != null) player.setName(newPlayer.getName());
@@ -221,12 +225,10 @@ public class PlayersService {
     }
 
     private Integer calcLevel(Integer exp){
-        return (int) ((Math.sqrt(2500 + 200. * exp) - 50) / 100);// (Math.sqrt(2500 + 200 * experince) - 50) / 100;
+        return (int) ((Math.sqrt(2500 + 200. * exp) - 50) / 100);
     }
 
     private Integer calcUntilNextLevel(Integer lvl, Integer exp) {
         return 50 * (lvl + 1) * (lvl + 2) - exp;
     }
-
-
 }

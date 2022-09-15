@@ -10,11 +10,11 @@ import java.util.List;
 public class PlayerRepositoryImpl implements PlayerRepository {
 
     @PersistenceContext
-    private EntityManager em;
+    private EntityManager entityManager;
 
     @Override
     public List getAllPlayersQuery(String name) {
-        TypedQuery query = em.createQuery(
+        TypedQuery query = entityManager.createQuery(
                 "select a from Player a where a.name = ?1", Player.class);
         query.setParameter(1, name);
 

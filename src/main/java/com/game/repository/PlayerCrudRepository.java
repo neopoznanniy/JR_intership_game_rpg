@@ -24,19 +24,4 @@ public interface PlayerCrudRepository extends PagingAndSortingRepository<Player,
             Integer maxLevel,
             Collection <Boolean> banneds,
             Pageable page);
-
-    /*Long countByPlayersByNameContainingAndTitleContainingAndRaceContainingAndProfessionContainingAndBirthdayBetweenAndExperienceBetweenAndLevelBetweenAndBannedInAllIgnoreCase(
-            String name,
-            String title,
-            String strRace,
-            String strProfession,
-            Date dateAfter,
-            Date dateBefore,
-            Integer minExpirience,
-            Integer maxExpirience,
-            Integer minLevel,
-            Integer maxLevel,
-            Collection<Boolean> banneds);*/
-
-
 }
