@@ -111,57 +111,13 @@ public class PlayerController {
 
     @PostMapping("/{id}")
     Player replacePlayer(@RequestBody Player newPlayer, @PathVariable String id) {
-        /*System.out.println("method replace:");
-        System.out.println(id);*/
-        Player player = null;
-        Long longId = null;
-//        System.out.println("newPlayer = " + newPlayer + ", id = " + id);
-        try {
-            longId = Long.parseLong(id);
-            if (longId <= 0) throw new ValidationException("Id is zero");
-            if (newPlayer.getExperience() < 0) throw new ValidationException("Experience less then 0");
-            if (newPlayer.getExperience() > 10_000_000) throw new ValidationException("Experience greater then 10_000_0000");
-            if (newPlayer.getBirthday().getTime() < 0) throw new ValidationException("Invalid birthday");
-            player = service.findById(longId).get();
-        } catch (Exception e) {
-//            System.out.println(e);
-            if (e instanceof ValidationException
-                    || e instanceof NumberFormatException)
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Parameters is not valid", e);
-            if (e instanceof NoSuchElementException)
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Player not found", e);
-        }
-
-
-        /*System.out.println("longId = " + longId);
-        System.out.println("newPlayer = " + newPlayer);*/
-        return service.replacePlayer(newPlayer, longId);
+        return service.replacePlayer(newPlayer, id);
     }
 
 
     @DeleteMapping("/{id}")
     void deletePlayer(@PathVariable String id) {
-
-
-        Player player = null;
-        Long longId = null;
-        try {
-            longId = Long.parseLong(id);
-            if (longId <= 0) throw new ValidationException("Id is zero or less");
-            player = service.findById(longId).get();
-            service.deleteById(longId);
-        } catch (Exception e) {
-//            System.out.println(e);
-            if (e instanceof ValidationException || e instanceof NumberFormatException)
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Id is not valid", e);
-            if (e instanceof NoSuchElementException)
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Player not found", e);
-        }
-
+        service.deleteById(id);
     }
 
 

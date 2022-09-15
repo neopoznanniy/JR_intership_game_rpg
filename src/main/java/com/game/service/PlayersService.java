@@ -154,12 +154,50 @@ public class PlayersService {
         return playerCrudRepository.save(player);
     }
 
-    public void deleteById(Long id) {
-        playerCrudRepository.deleteById(id);
+    public void deleteById(String id) {
+
+        Player player = null;
+        Long longId = null;
+        try {
+            longId = Long.parseLong(id);
+            if (longId <= 0) throw new ValidationException("Id is zero or less");
+            player = playerCrudRepository.findById(longId).get();
+            playerCrudRepository.deleteById(longId);
+        } catch (Exception e) {
+//            System.out.println(e);
+            if (e instanceof ValidationException || e instanceof NumberFormatException)
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Id is not valid", e);
+            if (e instanceof NoSuchElementException)
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Player not found", e);
+        }
     }
 
-    public Player replacePlayer(Player newPlayer, Long id) {
-        return playerCrudRepository.findById(id)
+    public Player replacePlayer(Player newPlayer, String id) {
+         /*System.out.println("method replace:");
+        System.out.println(id);*/
+        Player oldPlayer = null;
+        Long longId = null;
+//        System.out.println("newPlayer = " + newPlayer + ", id = " + id);
+        try {
+            longId = Long.parseLong(id);
+            if (longId <= 0) throw new ValidationException("Id is zero");
+            if (newPlayer.getExperience() < 0) throw new ValidationException("Experience less then 0");
+            if (newPlayer.getExperience() > 10_000_000) throw new ValidationException("Experience greater then 10_000_0000");
+            if (newPlayer.getBirthday().getTime() < 0) throw new ValidationException("Invalid birthday");
+            oldPlayer = playerCrudRepository.findById(longId).get();
+        } catch (Exception e) {
+//            System.out.println(e);
+            if (e instanceof ValidationException || e instanceof NumberFormatException)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameters is not valid", e);
+            if (e instanceof NoSuchElementException)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found", e);
+        }
+        final Long FIN_LONG_ID = longId;
+        /*System.out.println("longId = " + longId);
+        System.out.println("newPlayer = " + newPlayer);*/
+        return playerCrudRepository.findById(longId)
                 .map(player -> {
                     if (newPlayer.getName() != null) player.setName(newPlayer.getName());
                     if (newPlayer.getTitle() != null) player.setTitle(newPlayer.getTitle());
@@ -177,7 +215,7 @@ public class PlayersService {
                     return playerCrudRepository.save(player);
                 })
                 .orElseGet(() -> {
-                    newPlayer.setId(id);
+                    newPlayer.setId(FIN_LONG_ID);
                     return playerCrudRepository.save(newPlayer);
                 });
     }
